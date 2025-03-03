@@ -10,7 +10,7 @@
  **/
 static inline bool q_insert(struct list_head *head,
                             char *s,
-                            void (*target_func)(struct list_head *,
+                            void (*insert_func)(struct list_head *,
                                                 struct list_head *))
 {
     if (!head)
@@ -29,7 +29,7 @@ static inline bool q_insert(struct list_head *head,
     }
     strncpy(new->value, s, len);
 
-    target_func(&new->list, head);
+    insert_func(&new->list, head);
     return true;
 }
 
