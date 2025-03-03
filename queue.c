@@ -4,6 +4,36 @@
 
 #include "queue.h"
 
+/**
+ * Insert an element into the queue,
+ * used to simplify q_insert_head and q_insert_tail functions.
+ **/
+static inline bool q_insert(struct list_head *head,
+                            char *s,
+                            void (*target_func)(struct list_head *,
+                                                struct list_head *))
+{
+    if (!head)
+        return false;
+
+    element_t *new = malloc(sizeof(element_t));
+    if (!new)
+        return false;
+
+    INIT_LIST_HEAD(&new->list);
+    size_t len = strlen(s) + 1;
+    new->value = malloc(len * sizeof(char));
+    if (!new->value) {
+        free(new);
+        return false;
+    }
+    strncpy(new->value, s, len);
+
+    target_func(&new->list, head);
+    return true;
+}
+
+
 /* Create an empty queue */
 struct list_head *q_new()
 {
@@ -32,13 +62,13 @@ void q_free(struct list_head *head)
 /* Insert an element at head of queue */
 bool q_insert_head(struct list_head *head, char *s)
 {
-    return true;
+    return q_insert(head, s, list_add);
 }
 
 /* Insert an element at tail of queue */
 bool q_insert_tail(struct list_head *head, char *s)
 {
-    return true;
+    return q_insert(head, s, list_add_tail);
 }
 
 /* Remove an element from head of queue */
