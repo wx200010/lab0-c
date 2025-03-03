@@ -33,6 +33,28 @@ static inline bool q_insert(struct list_head *head,
     return true;
 }
 
+/**
+ * Remove the element from the queue
+ * Be used to simplify q_remove_head and q_remove_tail functions.
+ **/
+static inline element_t *q_remove(struct list_head *head,
+                                  struct list_head *node,
+                                  char *sp,
+                                  size_t bufsize)
+{
+    if (!head || head == node)
+        return NULL;
+
+    element_t *entry = list_entry(node, element_t, list);
+    list_del(&entry->list);
+
+    if (sp) {
+        strncpy(sp, entry->value, bufsize - 1);
+        sp[bufsize - 1] = '\0';
+    }
+    return entry;
+}
+
 
 /* Create an empty queue */
 struct list_head *q_new()
@@ -74,13 +96,13 @@ bool q_insert_tail(struct list_head *head, char *s)
 /* Remove an element from head of queue */
 element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
 {
-    return NULL;
+    return q_remove(head, head->next, sp, bufsize);
 }
 
 /* Remove an element from tail of queue */
 element_t *q_remove_tail(struct list_head *head, char *sp, size_t bufsize)
 {
-    return NULL;
+    return q_remove(head, head->prev, sp, bufsize);
 }
 
 /* Return number of elements in queue */
