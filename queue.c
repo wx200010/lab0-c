@@ -4,10 +4,11 @@
 
 #include "queue.h"
 
-/**
- * Insert an element into the queue,
- * used to simplify q_insert_head and q_insert_tail functions.
- **/
+/*
+ * Insert an element at the head or tail of the queue, depending on the caller.
+ * This function simplifies the implementation of q_insert_head and
+ * q_insert_tail.
+ */
 static inline bool q_insert(struct list_head *head,
                             char *s,
                             void (*insert_func)(struct list_head *,
@@ -33,10 +34,11 @@ static inline bool q_insert(struct list_head *head,
     return true;
 }
 
-/**
- * Remove the element from the queue
- * Be used to simplify q_remove_head and q_remove_tail functions.
- **/
+/*
+ * Remove an element from the head or tail of the queue, depending on the
+ * caller. This function simplifies the implementation of q_remove_head and
+ * q_remove_tail.
+ */
 static inline element_t *q_remove(struct list_head *head,
                                   struct list_head *node,
                                   char *sp,
