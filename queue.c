@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,6 +12,27 @@ static inline void print_list(struct list_head *head, struct list_head *tail)
         printf("\"%s\", ", list_entry(node, element_t, list)->value);
     }
     printf("\n");
+}
+
+/* Merge two list from the first element*/
+struct list_head *merge_two_lists(struct list_head *L1,
+                                  struct list_head *L2,
+                                  bool descend)
+{
+    /* Indirect pointer method */
+    struct list_head *head = NULL, **ptr = &head, **node;
+
+    for (node = &L1; L1 && L2; *node = (*node)->next) {
+        node = ((strcmp(list_entry(L1, element_t, list)->value,
+                        list_entry(L2, element_t, list)->value) <= 0) ^
+                descend)
+                   ? &L1
+                   : &L2;
+        *ptr = *node;
+        ptr = &(*ptr)->next;
+    }
+    *ptr = (struct list_head *) ((uintptr_t) L1 | (uintptr_t) L2);
+    return head;
 }
 
 /*
@@ -228,5 +250,43 @@ int q_descend(struct list_head *head)
 int q_merge(struct list_head *head, bool descend)
 {
     // https://leetcode.com/problems/merge-k-sorted-lists/
-    return 0;
+    if (!head || list_empty(head))
+        return 0;
+
+    int chain_size = q_size(head);
+
+    // Convert each queue to a non-circular linked list.
+    for (struct list_head *p = head->next; p != head; p = p->next) {
+        list_entry(p, queue_contex_t, chain)->q->prev->next = NULL;
+    }
+
+    // Merge all the queues into one sorted queue
+    struct list_head *L, *R = head->prev;
+    while (chain_size > 1) {
+        L = head->next;
+        while (L != R) {
+            queue_contex_t *contex_L = list_entry(L, queue_contex_t, chain);
+            queue_contex_t *contex_R = list_entry(R, queue_contex_t, chain);
+            contex_L->q->next =
+                merge_two_lists(contex_L->q->next, contex_R->q->next, descend);
+            contex_L->size += contex_R->size;
+            contex_R->q->prev = contex_R->q->next = contex_R->q;
+            R = R->prev;
+            if (L == R)
+                break;
+            L = L->next;
+        }
+        chain_size = (chain_size + 1) >> 1;
+    }
+    /* Restore the first queue to circular doubly Linked List*/
+    struct list_head *q_head = list_entry(head->next, queue_contex_t, chain)->q;
+    L = q_head;
+    while (L->next != NULL) {
+        L->next->prev = L;
+        L = L->next;
+    }
+    L->next = q_head;
+    q_head->prev = L;
+
+    return list_first_entry(head, queue_contex_t, chain)->size;
 }
