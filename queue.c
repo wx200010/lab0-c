@@ -70,13 +70,11 @@ static inline bool q_insert(struct list_head *head,
     if (!new)
         return false;
 
-    size_t len = strlen(s) + 1;
-    new->value = malloc(len * sizeof(char));
+    new->value = strdup(s);
     if (!new->value) {
         free(new);
         return false;
     }
-    strncpy(new->value, s, len);
 
     insert_func(&new->list, head);
     return true;
