@@ -70,7 +70,6 @@ static inline bool q_insert(struct list_head *head,
     if (!new)
         return false;
 
-    INIT_LIST_HEAD(&new->list);
     size_t len = strlen(s) + 1;
     new->value = malloc(len * sizeof(char));
     if (!new->value) {
