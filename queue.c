@@ -92,7 +92,7 @@ static inline element_t *q_remove(struct list_head *head,
                                   char *sp,
                                   size_t bufsize)
 {
-    if (!head || head == node)
+    if (!head || list_empty(head))
         return NULL;
 
     element_t *entry = list_entry(node, element_t, list);
@@ -104,7 +104,6 @@ static inline element_t *q_remove(struct list_head *head,
     }
     return entry;
 }
-
 
 /* Create an empty queue */
 struct list_head *q_new()
