@@ -4,6 +4,15 @@
 
 #include "queue.h"
 
+/* Print all elements starting from the head for debugging. */
+static inline void print_list(struct list_head *head, struct list_head *tail)
+{
+    for (struct list_head *node = head; node != tail; node = node->next) {
+        printf("\"%s\", ", list_entry(node, element_t, list)->value);
+    }
+    printf("\n");
+}
+
 /*
  * Insert an element at the head or tail of the queue, depending on the caller.
  * This function simplifies the implementation of q_insert_head and
