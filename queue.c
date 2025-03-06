@@ -35,6 +35,24 @@ struct list_head *merge_two_lists(struct list_head *L1,
     return head;
 }
 
+/* Perform merge sort on the list. */
+struct list_head *mergesort_list(struct list_head *head, bool descend)
+{
+    if (!head || !head->next)
+        return head;
+
+    struct list_head *slow = head, *mid, *left, *right;
+    for (const struct list_head *fast = head->next; fast && fast->next;
+         fast = fast->next->next)
+        slow = slow->next;
+    mid = slow->next;
+    slow->next = NULL;
+
+    left = mergesort_list(head, descend);
+    right = mergesort_list(mid, descend);
+    return merge_two_lists(left, right, descend);
+}
+
 /*
  * Insert an element at the head or tail of the queue, depending on the caller.
  * This function simplifies the implementation of q_insert_head and
@@ -227,7 +245,21 @@ void q_reverseK(struct list_head *head, int k)
 }
 
 /* Sort elements of queue in ascending/descending order */
-void q_sort(struct list_head *head, bool descend) {}
+void q_sort(struct list_head *head, bool descend)
+{
+    if (!head || list_empty(head))
+        return;
+    head->prev->next = NULL;
+    head->next = mergesort_list(head->next, descend);
+    /* Fix the prev pointer */
+    struct list_head *p = head;
+    while (p->next != NULL) {
+        p->next->prev = p;
+        p = p->next;
+    }
+    p->next = head;
+    head->prev = p;
+}
 
 /* Remove every node which has a node with a strictly less value anywhere to
  * the right side of it */
